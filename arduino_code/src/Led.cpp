@@ -8,9 +8,9 @@ void Led::setup()
 {
     for (int i = 0; i < MaxDevices; i++)
     {
-        lc.shutdown(i, false);  // 取消关闭模式
-        lc.setIntensity(i, 10); // 设置亮度
-        lc.clearDisplay(i);     // 清除显示
+        lc.shutdown(i, false); // 取消关闭模式
+        lc.setIntensity(i, 8); // 设置亮度
+        lc.clearDisplay(i);    // 清除显示
     }
 }
 

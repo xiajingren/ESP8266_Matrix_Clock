@@ -1,15 +1,14 @@
 #ifndef Led_h
 #define Led_h
 
-#include <Pin.h>
 #include <LedControl.h>
-
-const int MaxDevices = 4;
+#include "Const.h"
 
 class Led
 {
 private:
-    LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, MaxDevices);
+    const int MaxDevices = 4;
+    LedControl lc = LedControl(CONST_DIN_PIN, CONST_CLK_PIN, CONST_CS_PIN, MaxDevices);
 
 public:
     Led();
@@ -17,8 +16,6 @@ public:
     void setup();
 
     void setRow(int addr, int row, byte value);
-
-    // ~Led();
 };
 
 #endif
