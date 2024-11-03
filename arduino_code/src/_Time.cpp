@@ -5,6 +5,8 @@
 
 #include "Font.h"
 
+#include "Led.h"
+
 // 定义NTP客户端以获取时间
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "ntp.aliyun.com", 8 * 3600);
@@ -18,8 +20,15 @@ void _Time::setup()
     timeClient.begin();
 }
 
-void _Time::display(Led led)
+void _Time::display()
 {
+    unsigned long currentTime = millis();
+
+    if (lastTime > 0 && currentTime - lastTime < 1000)
+        return;
+
+    lastTime = currentTime;
+
     timeClient.update();
 
     int h = timeClient.getHours();
@@ -46,9 +55,9 @@ void _Time::display(Led led)
         byte row_data3 = (m2 >> 1);
         byte row_data4 = (s1 >> 1) | (s2 >> 5);
 
-        led.setRow(0, row, row_data1);
-        led.setRow(1, row, row_data2);
-        led.setRow(2, row, row_data3);
-        led.setRow(3, row, row_data4);
+        Led::setRow(0, row, row_data1);
+        Led::setRow(1, row, row_data2);
+        Led::setRow(2, row, row_data3);
+        Led::setRow(3, row, row_data4);
     }
 }

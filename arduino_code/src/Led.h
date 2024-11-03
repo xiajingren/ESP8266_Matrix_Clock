@@ -7,15 +7,14 @@
 class Led
 {
 private:
-    const int MaxDevices = 4;
-    LedControl lc = LedControl(CONST_DIN_PIN, CONST_CLK_PIN, CONST_CS_PIN, MaxDevices);
+    Led();
+    static int MaxDevices;
+    static LedControl lc;
 
 public:
-    Led();
+    static void setup();
 
-    void setup();
-
-    void setRow(int addr, int row, byte value);
+    static void setRow(int addr, int row, byte value);
 };
 
 #endif

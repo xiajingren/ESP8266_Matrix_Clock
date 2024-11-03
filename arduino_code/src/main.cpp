@@ -1,14 +1,15 @@
 #include <Arduino.h>
 
 #include "Wifi.h"
-
 #include "Led.h"
-
 #include "_Time.h"
+#include "Humiture.h"
+#include "Touch.h"
 
 Wifi wifi;
-Led led;
 _Time _time;
+Humiture humiture;
+Touch touch;
 
 void setup()
 {
@@ -16,14 +17,16 @@ void setup()
 
   Serial.begin(115200);
 
-  led.setup();
+  Led::setup();
   wifi.setup();
   _time.setup();
+  humiture.setup();
+  touch.setup();
 }
 
 void loop()
 {
-  _time.display(led);
-
-  delay(1000);
+  _time.display();
+  humiture.display();
+  touch.loop();
 }
