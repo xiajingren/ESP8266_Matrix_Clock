@@ -15,6 +15,8 @@ public:
     static void setup();
 
     static void setRow(int addr, int row, byte value);
+
+    static void setIntensity(int intensity);
 };
 
 #endif

@@ -19,3 +19,11 @@ void Led::setRow(int addr, int row, byte value)
 {
     Led::lc.setRow(addr, row, value);
 }
+
+void Led::setIntensity(int intensity)
+{
+    for (int i = 0; i < Led::MaxDevices; i++)
+    {
+        Led::lc.setIntensity(i, intensity); // 设置亮度
+    }
+}

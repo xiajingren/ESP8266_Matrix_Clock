@@ -8,6 +8,7 @@ const char *password = "13241178098";
 
 Wifi::Wifi()
 {
+    A0;
 }
 
 void Wifi::setup()
