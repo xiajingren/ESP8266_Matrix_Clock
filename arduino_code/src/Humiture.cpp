@@ -55,7 +55,3 @@ void Humiture::display()
     Serial.print(hif);
     Serial.println(F("°F"));
 }
-
-Humiture::Humiture()
-{
-}
