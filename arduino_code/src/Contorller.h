@@ -7,18 +7,8 @@
 class Contorller
 {
 private:
-    // MAX7219矩阵屏控制引脚
-    int DIN_PIN = 13;
-    int CLK_PIN = 14;
-    int CS_PIN = 12;
+    unsigned long lastTime = 0;
 
-    int MaxDevices = 4;
-
-    LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, MaxDevices);
-
-    int position = 0;
-
-    void initMatrix();
     void setIntensity(int intensity);
 
     void displayHumiture();
@@ -35,6 +25,11 @@ private:
     void makeNumber(size_t &index, byte *content, float data, signed char width = 0, unsigned char prec = 0, unsigned char numberStyle = 0);
 
     void scrollLeft(byte *content, size_t size);
+
+    static void initMatrix();
+    static void shutdownMatrix();
+    static void onPress();
+    static void onLongPressStart();
 
 public:
     void setup();

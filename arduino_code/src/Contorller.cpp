@@ -2,24 +2,93 @@
 
 #include "Font.h"
 #include "Arduino.h"
+#include "Touch.h"
+#include "_Time.h"
+#include "Humiture.h"
+#include "WifiConfig.h"
+
+Touch touch;
+_Time _time;
+Humiture humiture;
+WifiConfig wifiConfig;
+
+// MAX7219矩阵屏控制引脚
+int DIN_PIN = 13;
+int CLK_PIN = 14;
+int CS_PIN = 12;
+
+int MaxDevices = 4;
+
+int mode = 1;
+
+int position = 0;
+
+LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, MaxDevices);
+
+void Contorller::onPress()
+{
+    if (mode == 0)
+        return;
+
+    if (mode >= 3)
+        mode = 1;
+    else
+        mode++;
+
+    position = 0;
+}
+
+void Contorller::onLongPressStart()
+{
+    if (mode == 0)
+    {
+        mode = 1;
+        position = 0;
+        initMatrix();
+    }
+    else
+    {
+        mode = 0;
+        shutdownMatrix();
+    }
+}
 
 void Contorller::setup()
 {
     initMatrix();
+    _time.setup();
+    humiture.setup();
+    touch.setup(onPress, onLongPressStart);
+    wifiConfig.setup();
 }
 
 void Contorller::loop()
 {
-    // displayHumiture();
-    displayTime();
-    // displayDate();
+    _time.loop();
+    humiture.loop();
+    touch.loop();
 
-    // lc.setColumn(0, 0, B00000001);
-    // lc.setColumn(1, 1, B01000001);
-    // lc.setColumn(2, 2, B01100011);
-    // lc.setColumn(3, 3, B01110111);
+    unsigned long currentTime = millis();
 
-    delay(100);
+    if (lastTime > 0 && currentTime - lastTime < 100)
+        return;
+
+    lastTime = currentTime;
+
+    switch (mode)
+    {
+    case 1:
+        displayTime();
+        break;
+    case 2:
+        displayDate();
+        break;
+    case 3:
+        displayHumiture();
+        break;
+    default:
+        break;
+    }
 }
 
 void Contorller::initMatrix()
@@ -41,11 +110,8 @@ void Contorller::setIntensity(int intensity)
 
 void Contorller::displayHumiture()
 {
-    float t = -23.60;
-    float h = -45.50;
-
     byte content[100];
-    size_t size = getHumitureContent(t, h, content);
+    size_t size = getHumitureContent(humiture.temperature, humiture.humidity, content);
 
     scrollLeft(content, size);
 }
@@ -77,10 +143,8 @@ void Contorller::makeSpace(size_t &index, byte *content, size_t count)
 
 void Contorller::displayTime()
 {
-    DateTime dt = DateTime(2024, 1, 1, 12, 9, 20);
-
     byte content[32];
-    getTimeContent(dt, content);
+    getTimeContent(_time.now, content);
 
     for (int i = 0; i < MaxDevices; i++)
     {
@@ -110,16 +174,13 @@ size_t Contorller::getTimeContent(DateTime dt, byte *content)
 
     makeNumber(index, content, s, 2, 0, 1);
 
-    Serial.println(index);
-
     return index;
 }
 
 void Contorller::displayDate()
 {
-    DateTime dt = DateTime(2024, 1, 2, 12, 10, 20);
     byte content[100];
-    size_t size = getDateContent(dt, content);
+    size_t size = getDateContent(_time.now, content);
 
     scrollLeft(content, size);
 }
@@ -137,13 +198,13 @@ size_t Contorller::getDateContent(DateTime dt, byte *content)
     makeNumber(index, content, y);
     makeSpace(index, content);
 
-    copyToContent(index, content, Fonts_Char1[0], sizeof(Fonts_Char1[0]));
+    copyToContent(index, content, Fonts_Char3[0], sizeof(Fonts_Char3[0]));
     makeSpace(index, content);
 
     makeNumber(index, content, m, 2);
     makeSpace(index, content);
 
-    copyToContent(index, content, Fonts_Char1[0], sizeof(Fonts_Char1[0]));
+    copyToContent(index, content, Fonts_Char3[0], sizeof(Fonts_Char3[0]));
     makeSpace(index, content);
 
     makeNumber(index, content, d, 2);
@@ -192,8 +253,6 @@ void Contorller::makeNumber(size_t &index, byte *content, float data, signed cha
     char temp[10];
     sprintf(temp, "%0*.*f", width, prec, data);
 
-    Serial.println("ss1111:" + String(temp));
-
     for (size_t i = 0; i < sizeof(temp); i++)
     {
         if (temp[i] == '\0')
@@ -240,4 +299,12 @@ void Contorller::scrollLeft(byte *content, size_t size)
     position--;
     if (position < static_cast<int>(0 - size))
         position = MaxDevices * 8;
+}
+
+void Contorller::shutdownMatrix()
+{
+    for (int i = 0; i < MaxDevices; i++)
+    {
+        lc.shutdown(i, true);
+    }
 }

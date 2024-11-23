@@ -23,10 +23,11 @@ void setup()
   Serial.println("start...");
 
   contorller.setup();
-  // Led::setup();
-  // wifi.setup();
-  // _time.setup();
-  // humiture.setup();
+
+  //  Led::setup();
+  //  wifi.setup();
+  //  _time.setup();
+  //  humiture.setup();
   // touch.setup();
 }
 

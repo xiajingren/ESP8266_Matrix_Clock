@@ -5,9 +5,7 @@ class Touch
 {
 private:
 public:
-    Touch();
-
-    void setup();
+    void setup(void(onPress()), void(onLongPressStart()));
 
     void loop();
 };

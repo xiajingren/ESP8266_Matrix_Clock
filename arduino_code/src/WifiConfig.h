@@ -1,13 +1,11 @@
 #ifndef Wifi_h
 #define Wifi_h
 
-class Wifi
+class WifiConfig
 {
 private:
     /* data */
 public:
-    Wifi(/* args */);
-
     void setup();
 };
 
